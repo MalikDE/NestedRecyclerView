@@ -24,7 +24,7 @@ class NestedGestureHandler(val context: Context, val orientation: Int) {
         fun canChildScroll(): Boolean
     }
 
-    lateinit var mLastEvent: MotionEvent
+    var mLastEvent: MotionEvent? = null
 
     fun shouldIntercept(e: MotionEvent): Boolean {
         var intercepted: Boolean = true //default state = true
@@ -34,14 +34,19 @@ class NestedGestureHandler(val context: Context, val orientation: Int) {
             mLastEvent = MotionEvent.obtain(e)
         }
 
-        if (action == MotionEvent.ACTION_MOVE && mLastEvent != null) {
-            val dx = Math.round(e.x - mLastEvent.x)
-            val dy = Math.round(e.y - mLastEvent.y)
+        val lastEvent: MotionEvent? = mLastEvent
+
+        if (action == MotionEvent.ACTION_MOVE && lastEvent != null) {
+
+            val dx = Math.round(e.x - lastEvent.x)
+            val dy = Math.round(e.y - lastEvent.y)
+
             val slop = ViewConfiguration.get(context).scaledTouchSlop
             if (isForChild(dx.toFloat(), dy.toFloat(), slop)) {
                 intercepted = false //do not intercept
             }
         }
+
         return intercepted
     }
 
