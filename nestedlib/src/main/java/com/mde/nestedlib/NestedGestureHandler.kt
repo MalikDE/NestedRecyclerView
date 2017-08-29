@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewConfiguration
 
 /**
- * The main method is [shouldIntercept]. It returns true if the parent should intercept th touch event
+ * The main method is [isForChild]. It returns true if the parent should intercept th touch event
  * for itself or false if it must dispatch the event to the child view. It that case, the parent
  * should return false in its onInterceptTouchEvent override method.
  * @param context : Current context
@@ -26,27 +26,24 @@ class NestedGestureHandler(val context: Context, val orientation: Int) {
 
     var mLastEvent: MotionEvent? = null
 
-    fun shouldIntercept(e: MotionEvent): Boolean {
-        var intercepted: Boolean = true //default state = true
+    fun isForChild(e: MotionEvent): Boolean {
+        var intercepted: Boolean = false
         val action = e.getAction()
 
         if (action == MotionEvent.ACTION_DOWN) {
             mLastEvent = MotionEvent.obtain(e)
         }
 
-        val lastEvent: MotionEvent? = mLastEvent
-
-        if (action == MotionEvent.ACTION_MOVE && lastEvent != null) {
-
-            val dx = Math.round(e.x - lastEvent.x)
-            val dy = Math.round(e.y - lastEvent.y)
-
-            val slop = ViewConfiguration.get(context).scaledTouchSlop
-            if (isForChild(dx.toFloat(), dy.toFloat(), slop)) {
-                intercepted = false //do not intercept
+        mLastEvent?.let {
+            if (action == MotionEvent.ACTION_MOVE) {
+                val dx = Math.round(e.x - it.x)
+                val dy = Math.round(e.y - it.y)
+                val slop = ViewConfiguration.get(context).scaledTouchSlop
+                if (isTouchValid(dx.toFloat(), dy.toFloat(), slop)) {
+                    intercepted = true //this is a child event
+                }
             }
         }
-
         return intercepted
     }
 
@@ -57,7 +54,7 @@ class NestedGestureHandler(val context: Context, val orientation: Int) {
      * @return : true if the Y scroll distance is more than the slop threshold
      *           and the scroll angle is between +-pi/4 and +-3*pi/4
      */
-    private fun isForChild(distanceX: Float, distanceY: Float, slop: Int): Boolean {
+    private fun isTouchValid(distanceX: Float, distanceY: Float, slop: Int): Boolean {
         return if (orientation == LinearLayoutManager.VERTICAL) Math.abs(distanceX) >= Math.abs(distanceY) && Math.abs(distanceX) > slop
         else Math.abs(distanceY) >= Math.abs(distanceX) && Math.abs(distanceY) > slop
     }
