@@ -2,20 +2,23 @@ apply plugin: 'com.android.application'
 
 apply plugin: 'kotlin-android'
 
-apply plugin: 'kotlin-android-extensions'
-
 android {
     compileSdkVersion 26
     buildToolsVersion "26.0.0"
     defaultConfig {
         applicationId "com.mde.nestedrecylcer"
-        minSdkVersion 16
+        minSdkVersion 21
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            versionNameSuffix "-D"
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -31,6 +34,8 @@ dependencies {
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
     implementation 'com.android.support:appcompat-v7:26.0.1'
     implementation 'com.android.support:recyclerview-v7:26.0.1'
+    compile 'com.android.support.constraint:constraint-layout:1.0.2'
+
     implementation project(':nestedlib')
     testImplementation 'junit:junit:4.12'
 }
