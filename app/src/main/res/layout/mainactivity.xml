@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/main_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?android:attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:minHeight="?android:attr/actionBarSize"
+        android:theme="@style/ThemeActionBar"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <TextView
+        android:id="@+id/classicTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:padding="5dp"
+        android:text="CLASSIC"
+        android:textSize="20sp"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/main_toolbar"/>
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/classic_recycler"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        app:layout_constraintBottom_toTopOf="@+id/improvedTv"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/classicTv">
+    </android.support.v7.widget.RecyclerView>
+
+    <TextView
+        android:id="@+id/improvedTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="bottom"
+        android:padding="5dp"
+        android:text="IMPROVED"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/improved_recycler"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/classic_recycler"
+        android:layout_marginTop="8dp"/>
+
+    <com.mde.nestedlib.ParentRecyclerView
+        android:id="@+id/improved_recycler"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginBottom="0dp"
+        android:layout_marginEnd="0dp"
+        android:layout_marginStart="0dp"
+        android:layout_marginTop="0dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.5"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/improvedTv"
+        app:layout_constraintVertical_bias="0.5"
+        app:nestedEnabled="true">
+    </com.mde.nestedlib.ParentRecyclerView>
+
+</android.support.constraint.ConstraintLayout>
