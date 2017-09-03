@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewConfiguration
 
 /**
- * The main method is [isForChild]. It returns true if the parent should intercept th touch event
+ * The main method is [isForChild]. It returns true if the parent should intercept the touch event
  * for itself or false if it must dispatch the event to the child view. It that case, the parent
  * should return false in its onInterceptTouchEvent override method.
  * @param context : Current context
@@ -24,10 +24,15 @@ class NestedGestureHandler(val context: Context, val orientation: Int) {
         fun canChildScroll(): Boolean
     }
 
-    var mLastEvent: MotionEvent? = null
+    /**
+     * max amount of scroll angle required to dispatch event to child
+     */
+    var mAngle: Double = Math.PI / 4
+
+    private var mLastEvent: MotionEvent? = null
 
     fun isForChild(e: MotionEvent): Boolean {
-        var intercepted: Boolean = false
+        var forChild = false
         val action = e.getAction()
 
         if (action == MotionEvent.ACTION_DOWN) {
@@ -36,27 +41,20 @@ class NestedGestureHandler(val context: Context, val orientation: Int) {
 
         mLastEvent?.let {
             if (action == MotionEvent.ACTION_MOVE) {
-                val dx = Math.round(e.x - it.x)
-                val dy = Math.round(e.y - it.y)
-                val slop = ViewConfiguration.get(context).scaledTouchSlop
-                if (isTouchValid(dx.toFloat(), dy.toFloat(), slop)) {
-                    intercepted = true //this is a child event
-                }
+                val dx: Double = Math.abs(Math.round(e.x - it.x)).toDouble()
+                val dy: Double = Math.abs(Math.round(e.y - it.y)).toDouble()
+                val slopVector = Math.sqrt(dx * dx + dy * dy)
+
+                /**
+                 * forChild is true if mAngle performed by touch vector is <= nested mAngle
+                 */
+                forChild = slopVector > ViewConfiguration.get(context).scaledTouchSlop &&
+                        if (orientation == LinearLayoutManager.VERTICAL) Math.atan2(dy, dx) <= mAngle
+                        else Math.atan2(dy, dx) >= mAngle
+
             }
         }
-        return intercepted
-    }
-
-    /**
-     * @param distanceX : delta X scrolled
-     * @param distanceY : delta Y scrolled
-     * @param slop      : Distance in pixels a touch can wander before we think the user is scrolling
-     * @return : true if the Y scroll distance is more than the slop threshold
-     *           and the scroll angle is between +-pi/4 and +-3*pi/4
-     */
-    private fun isTouchValid(distanceX: Float, distanceY: Float, slop: Int): Boolean {
-        return if (orientation == LinearLayoutManager.VERTICAL) Math.abs(distanceX) >= Math.abs(distanceY) && Math.abs(distanceX) > slop
-        else Math.abs(distanceY) >= Math.abs(distanceX) && Math.abs(distanceY) > slop
+        return forChild
     }
 
     /**
@@ -66,7 +64,7 @@ class NestedGestureHandler(val context: Context, val orientation: Int) {
      * its onInterceptTouchEvent method.
      */
     fun dispatchToChild(recyclerView: RecyclerView, e: MotionEvent): Boolean {
-        val view: View = recyclerView.findChildViewUnder(e.x, e.y)
+        val view: View? = recyclerView.findChildViewUnder(e.x, e.y)
         return (view is ScrollableChild && view.canChildScroll())
     }
 }
