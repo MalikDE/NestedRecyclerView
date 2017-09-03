@@ -2,9 +2,15 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
       xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/spinner"
+        android:id="@+id/spinner_angle"
         android:background="#ff00"
-        android:title="ActionBar Spinner"
+        android:title="Angle"
+        app:actionViewClass="android.widget.Spinner"
+        app:showAsAction="always"/>
+    <item
+        android:id="@+id/spinner_orientation"
+        android:background="#ff00"
+        android:title="Orientation"
         app:actionViewClass="android.widget.Spinner"
         app:showAsAction="always"/>
 </menu>

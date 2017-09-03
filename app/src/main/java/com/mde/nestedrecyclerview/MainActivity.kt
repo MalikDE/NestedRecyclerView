@@ -2,8 +2,9 @@ package com.mde.nestedrecyclerview
 
 import android.content.Context
 import android.os.Bundle
+import android.support.annotation.ArrayRes
+import android.support.annotation.IdRes
 import android.support.v4.graphics.ColorUtils
-import android.support.v4.view.MenuItemCompat
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
@@ -16,50 +17,73 @@ import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import android.widget.Spinner
 import com.mde.nestedlib.NestedGestureHandler
+import com.mde.nestedlib.ParentRecyclerView
 
 
 class MainActivity : AppCompatActivity() {
 
+    var mNestedScrollAngle: Double = Math.PI / 4
+    var mOrientation: Int = LinearLayoutManager.VERTICAL
+
     //just for fun, could have been a val inside onCreate()
-    private val recycler: RecyclerView by bind(R.id.improved_recycler)
+    private val mImprovedRecycler: ParentRecyclerView by bind(R.id.improved_recycler)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.mainactivity)
         setSupportActionBar(findViewById<Toolbar>(R.id.main_toolbar))
-        setupRecyclers(LinearLayoutManager.HORIZONTAL)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         menuInflater.inflate(R.menu.menu, menu)
-
-        val item = menu.findItem(R.id.spinner)
-        val spinner = MenuItemCompat.getActionView(item) as Spinner
-
-        val adapter = ArrayAdapter.createFromResource(this,
-                R.array.spinner_array, android.R.layout.simple_spinner_item)
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-
-        spinner.setAdapter(adapter)
-        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+        setupSpinner(menu, R.id.spinner_orientation, R.array.spinner_orientation_array, object : AdapterView.OnItemSelectedListener {
             override fun onNothingSelected(p0: AdapterView<*>?) {
             }
 
             override fun onItemSelected(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
-                setupRecyclers(if (p2 == 0) LinearLayoutManager.VERTICAL else LinearLayoutManager.HORIZONTAL)
+                mOrientation = if (p2 == 0) LinearLayoutManager.VERTICAL else LinearLayoutManager.HORIZONTAL
+                setupRecyclers()
             }
 
-        }
+        })
+        setupSpinner(menu, R.id.spinner_angle, R.array.spinner_angle_array, object : AdapterView.OnItemSelectedListener {
+            override fun onNothingSelected(p0: AdapterView<*>?) {
+            }
+
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+                mNestedScrollAngle = Math.toRadians(resources.getStringArray(R.array.spinner_angle_array).get(position).toDouble())
+                setupRecyclers()
+            }
+        })
+
         return true
     }
 
-    fun setupRecyclers(orientation: Int) {
-        //init improved recyclerView
-        recycler.layoutManager = LinearLayoutManager(this, orientation, false)
-        recycler.adapter = SubRecyclerAdapter()
-        recycler.adapter.notifyDataSetChanged()
+    private fun setupSpinner(menu: Menu, @IdRes layoutId: Int, @ArrayRes arrayId: Int, listener: AdapterView.OnItemSelectedListener) {
+        val item = menu.findItem(layoutId)
+        val spinner = item.actionView as Spinner
 
-        //init classic recyclerView
+        val adapter = ArrayAdapter.createFromResource(this,
+                arrayId, android.R.layout.simple_spinner_item)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+
+        spinner.setAdapter(adapter)
+        spinner.onItemSelectedListener = listener
+    }
+
+    private fun setupRecyclers() {
+        setupImprovedRecycler(mOrientation)
+        setupClassicRecycler(mOrientation)
+    }
+
+    private fun setupImprovedRecycler(orientation: Int) {
+        //init improved recyclerView
+        mImprovedRecycler.setLayoutManager(LinearLayoutManager(this, orientation, false), mNestedScrollAngle)
+        mImprovedRecycler.adapter = SubRecyclerAdapter()
+        mImprovedRecycler.adapter.notifyDataSetChanged()
+    }
+
+    private fun setupClassicRecycler(orientation: Int) {
         val classicRecycler: RecyclerView by bind(R.id.classic_recycler)
         classicRecycler.layoutManager = LinearLayoutManager(this, orientation, false)
         classicRecycler.adapter = SubRecyclerAdapter()
@@ -67,7 +91,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * An adapter for sub recycler views
+     * An adapter for sub mImprovedRecycler views
      */
     class SubRecyclerAdapter() : RecyclerView.Adapter<SubRecyclerAdapter.RecyclerViewHolder>() {
         class RecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
