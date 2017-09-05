@@ -5,6 +5,7 @@ import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.MotionEvent
+import android.view.View
 
 /**
  * A custom RecyclerView that uses a [NestedGestureHandler] to dispatch event to other nested recycler view.
@@ -14,6 +15,13 @@ import android.view.MotionEvent
  *
  */
 class ParentRecyclerView : RecyclerView {
+
+    interface ScrollableChild {
+        /**
+         * This method must be override by child views that would like to scroll
+         */
+        fun canChildScroll(): Boolean
+    }
 
     constructor(context: Context?) : super(context)
     constructor(context: Context?, attrs: AttributeSet) : super(context, attrs) {
@@ -35,9 +43,15 @@ class ParentRecyclerView : RecyclerView {
 
     override fun onInterceptTouchEvent(e: MotionEvent): Boolean {
         if (mIsScrollHandled && mGestureHandler.isForChild(e)) {
-            // If the event has been correctly dispatched to the child view, return false, as the parent
-            // should not intercept the event anymore
-            if (mGestureHandler.dispatchToChild(this@ParentRecyclerView, e)) {
+
+            /**
+             * Finally, check if the underlying view is of type [ScrollableChild] and can
+             * actually scroll
+             */
+            val view: View? = findChildViewUnder(e.x, e.y)
+            if (view is ScrollableChild && view.canChildScroll()) {
+                // return false, as the parent should not intercept the event. It will be dispatch
+                // to the child view
                 return false
             }
         }

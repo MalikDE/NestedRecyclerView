@@ -16,7 +16,6 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.FrameLayout
 import android.widget.Spinner
-import com.mde.nestedlib.NestedGestureHandler
 import com.mde.nestedlib.ParentRecyclerView
 
 
@@ -95,7 +94,7 @@ class MainActivity : AppCompatActivity() {
      */
     class SubRecyclerAdapter() : RecyclerView.Adapter<SubRecyclerAdapter.RecyclerViewHolder>() {
         class RecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
-        class ScrollableRecycler(context: Context?) : RecyclerView(context), NestedGestureHandler.ScrollableChild {
+        class ScrollableRecycler(context: Context?) : RecyclerView(context), ParentRecyclerView.ScrollableChild {
             override fun canChildScroll(): Boolean {
                 return true
             }
