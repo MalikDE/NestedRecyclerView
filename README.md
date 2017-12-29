@@ -6,12 +6,8 @@ event will be dispatched to the underlying child view (another recycler view)
 
 ### Classic
 The classic implementation seems to be less than 45° to allow an horizontal scroll.
-![classic]
+<img src="https://raw.githubusercontent.com/MalikDE/NestedRecyclerView/master/doc/img/classic.gif" width="300">
 
 ### Improved
 In the example bellow, angle is customized up to 70 degrees.
-![improved]
-
-
-[classic]: https://raw.githubusercontent.com/MalikDE/NestedRecyclerView/master/doc/img/classic.gif
-[improved]: https://raw.githubusercontent.com/MalikDE/NestedRecyclerView/master/doc/img/imp.gif
+<img src="https://raw.githubusercontent.com/MalikDE/NestedRecyclerView/master/doc/img/imp.gif" width="300">
