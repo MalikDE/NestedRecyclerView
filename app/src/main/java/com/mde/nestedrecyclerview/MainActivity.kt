@@ -2,6 +2,7 @@ package com.mde.nestedrecyclerview
 
 import android.content.Context
 import android.os.Bundle
+import android.util.AttributeSet
 import android.view.*
 import android.widget.*
 import androidx.annotation.ArrayRes
@@ -73,7 +74,6 @@ class MainActivity : AppCompatActivity() {
         //init improved recyclerView
         mImprovedRecycler.setLayoutManager(LinearLayoutManager(this, orientation, false), mNestedScrollAngle)
         mImprovedRecycler.adapter = SubRecyclerAdapter()
-        (mImprovedRecycler.adapter as SubRecyclerAdapter).notifyDataSetChanged()
     }
 
     private fun setupClassicRecycler(orientation: Int) {
@@ -87,14 +87,10 @@ class MainActivity : AppCompatActivity() {
      */
     class SubRecyclerAdapter : RecyclerView.Adapter<SubRecyclerAdapter.RecyclerViewHolder>() {
         class RecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
-        class ScrollableRecycler(context: Context) : RecyclerView(context), ParentRecyclerView.ScrollableChild {
-            override fun canChildScroll(): Boolean {
-                return true
-            }
-        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerViewHolder {
-            val recycler: RecyclerView = ScrollableRecycler(parent.context)
+            val v = LayoutInflater.from(parent.context).inflate(R.layout.list_item, parent, false)
+            val recycler: RecyclerView = v.findViewById(R.id.list_child)
             val layoutManager: LinearLayoutManager = (parent as RecyclerView).layoutManager as LinearLayoutManager
 
             if (layoutManager.orientation == LinearLayoutManager.VERTICAL) {
@@ -107,7 +103,7 @@ class MainActivity : AppCompatActivity() {
 
             val baseColor: Int = 255 / itemCount * viewType
             recycler.adapter = CellAdapter(baseColor)
-            return RecyclerViewHolder(recycler)
+            return RecyclerViewHolder(v)
         }
 
         override fun onBindViewHolder(holder: RecyclerViewHolder, position: Int) {
@@ -149,5 +145,20 @@ class MainActivity : AppCompatActivity() {
         override fun getItemCount(): Int {
             return 20
         }
+    }
+}
+
+class ScrollableRecyclerView : RecyclerView, ParentRecyclerView.ScrollableChild {
+
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs)
+    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(
+        context,
+        attrs,
+        defStyle
+    )
+
+    override fun canChildScroll(): Boolean {
+        return true
     }
 }
