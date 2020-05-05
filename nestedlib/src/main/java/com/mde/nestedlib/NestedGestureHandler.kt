@@ -1,9 +1,9 @@
 package com.mde.nestedlib
 
 import android.content.Context
-import android.support.v7.widget.LinearLayoutManager
 import android.view.MotionEvent
 import android.view.ViewConfiguration
+import androidx.recyclerview.widget.LinearLayoutManager
 
 /**
  * It returns true if the parent should intercept the touch event for itself or false

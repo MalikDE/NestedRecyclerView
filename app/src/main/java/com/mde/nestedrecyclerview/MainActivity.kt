@@ -2,20 +2,14 @@ package com.mde.nestedrecyclerview
 
 import android.content.Context
 import android.os.Bundle
-import android.support.annotation.ArrayRes
-import android.support.annotation.IdRes
-import android.support.v4.graphics.ColorUtils
-import android.support.v7.app.AppCompatActivity
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.Toolbar
-import android.view.Menu
-import android.view.View
-import android.view.ViewGroup
-import android.widget.AdapterView
-import android.widget.ArrayAdapter
-import android.widget.FrameLayout
-import android.widget.Spinner
+import android.view.*
+import android.widget.*
+import androidx.annotation.ArrayRes
+import androidx.annotation.IdRes
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.graphics.ColorUtils
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.mde.nestedlib.ParentRecyclerView
 
 
@@ -30,7 +24,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.mainactivity)
-        setSupportActionBar(findViewById<Toolbar>(R.id.main_toolbar))
+        setSupportActionBar(findViewById(R.id.main_toolbar))
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -50,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-                mNestedScrollAngle = Math.toRadians(resources.getStringArray(R.array.spinner_angle_array).get(position).toDouble())
+                mNestedScrollAngle = Math.toRadians(resources.getStringArray(R.array.spinner_angle_array)[position].toDouble())
                 setupRecyclers()
             }
         })
@@ -66,7 +60,7 @@ class MainActivity : AppCompatActivity() {
                 arrayId, android.R.layout.simple_spinner_item)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
 
-        spinner.setAdapter(adapter)
+        spinner.adapter = adapter
         spinner.onItemSelectedListener = listener
     }
 
@@ -79,22 +73,21 @@ class MainActivity : AppCompatActivity() {
         //init improved recyclerView
         mImprovedRecycler.setLayoutManager(LinearLayoutManager(this, orientation, false), mNestedScrollAngle)
         mImprovedRecycler.adapter = SubRecyclerAdapter()
-        mImprovedRecycler.adapter.notifyDataSetChanged()
+        (mImprovedRecycler.adapter as SubRecyclerAdapter).notifyDataSetChanged()
     }
 
     private fun setupClassicRecycler(orientation: Int) {
         val classicRecycler: RecyclerView by bind(R.id.classic_recycler)
         classicRecycler.layoutManager = LinearLayoutManager(this, orientation, false)
         classicRecycler.adapter = SubRecyclerAdapter()
-        classicRecycler.adapter.notifyDataSetChanged()
     }
 
     /**
      * An adapter for sub mImprovedRecycler views
      */
-    class SubRecyclerAdapter() : RecyclerView.Adapter<SubRecyclerAdapter.RecyclerViewHolder>() {
+    class SubRecyclerAdapter : RecyclerView.Adapter<SubRecyclerAdapter.RecyclerViewHolder>() {
         class RecyclerViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
-        class ScrollableRecycler(context: Context?) : RecyclerView(context), ParentRecyclerView.ScrollableChild {
+        class ScrollableRecycler(context: Context) : RecyclerView(context), ParentRecyclerView.ScrollableChild {
             override fun canChildScroll(): Boolean {
                 return true
             }
@@ -114,7 +107,6 @@ class MainActivity : AppCompatActivity() {
 
             val baseColor: Int = 255 / itemCount * viewType
             recycler.adapter = CellAdapter(baseColor)
-            recycler.adapter.notifyDataSetChanged()
             return RecyclerViewHolder(recycler)
         }
 
@@ -134,15 +126,15 @@ class MainActivity : AppCompatActivity() {
     /**
      * An adapter for cell views inside sub recyclerView
      */
-    class CellAdapter(val baseColor: Int) : RecyclerView.Adapter<CellAdapter.CellHolder>() {
+    class CellAdapter(private val baseColor: Int) : RecyclerView.Adapter<CellAdapter.CellHolder>() {
         class CellHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CellHolder {
-            val cellView: View = View(parent.context)
+            val cellView = View(parent.context)
             val size: Int = parent.context.convertDipsToPixel(90)
             cellView.layoutParams = ViewGroup.LayoutParams(size, size)
 
-            val frameLayout: FrameLayout = FrameLayout(parent.context)
+            val frameLayout = FrameLayout(parent.context)
             val padding: Int = parent.context.convertDipsToPixel(5)
             frameLayout.setPadding(padding, padding, padding, padding)
             frameLayout.addView(cellView)
