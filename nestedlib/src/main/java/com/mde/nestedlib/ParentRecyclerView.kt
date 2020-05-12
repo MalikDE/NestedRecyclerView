@@ -1,11 +1,11 @@
 package com.mde.nestedlib
 
 import android.content.Context
-import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.util.AttributeSet
 import android.view.MotionEvent
 import android.view.View
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 
 /**
  * A custom RecyclerView that uses a [NestedGestureHandler] to dispatch event to other nested recycler view.
@@ -23,19 +23,19 @@ class ParentRecyclerView : RecyclerView {
         fun canChildScroll(): Boolean
     }
 
-    constructor(context: Context?) : super(context)
-    constructor(context: Context?, attrs: AttributeSet) : super(context, attrs) {
+    constructor(context: Context) : super(context)
+    constructor(context: Context, attrs: AttributeSet) : super(context, attrs) {
         initAttributes(attrs, 0)
     }
 
-    constructor(context: Context?, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
+    constructor(context: Context, attrs: AttributeSet, defStyle: Int) : super(context, attrs, defStyle) {
         initAttributes(attrs, 0)
     }
 
     var mGestureHandler = NestedGestureHandler(context, LinearLayoutManager.VERTICAL)
     var mIsScrollHandled: Boolean = false
 
-    fun initAttributes(attrs: AttributeSet, defStyle: Int) {
+    private fun initAttributes(attrs: AttributeSet, defStyle: Int) {
         val a = context.obtainStyledAttributes(attrs, R.styleable.NestedRecycler, defStyle, 0)
         mIsScrollHandled = a.getBoolean(R.styleable.NestedRecycler_nestedEnabled, false)
         a.recycle()
@@ -67,7 +67,7 @@ class ParentRecyclerView : RecyclerView {
     }
 
     fun setLayoutManager(layout: LayoutManager?, angle: Double) {
-        setLayoutManager(layout)
+        layoutManager = layout
         mGestureHandler.mAngle = angle
     }
 }

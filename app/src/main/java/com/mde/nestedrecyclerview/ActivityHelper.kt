@@ -2,8 +2,8 @@ package com.mde.nestedrecyclerview
 
 import android.app.Activity
 import android.content.Context
-import android.support.annotation.IdRes
 import android.view.View
+import androidx.annotation.IdRes
 
 fun <T : View> Activity.bind(@IdRes res: Int): Lazy<T> {
     return lazy { findViewById<T>(res) }
